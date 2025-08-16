@@ -1,6 +1,7 @@
 package com.gerenciadororcamentos.entity;
 
 
+import com.gerenciadororcamentos.dto.DadosCadastroCliente;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Data
+@Builder
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,5 +24,21 @@ public class Cliente {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Orcamento> orcamentos;
+
+
+    public Cliente(DadosCadastroCliente dados) {
+
+        this.id = dados.id();
+
+        if (nome==null) {
+            this.nome = dados.nome();
+        }
+        if (email==null) {
+            this.email = dados.email();
+        }
+        if (telefone==null) {
+            this.telefone = dados.telefone();
+        }
+    }
 
 }
