@@ -28,8 +28,6 @@ public class Cliente {
 
     public Cliente(DadosCadastroCliente dados) {
 
-        this.id = dados.id();
-
         if (nome==null) {
             this.nome = dados.nome();
         }

@@ -1,5 +1,6 @@
 package com.gerenciadororcamentos.controller;
 
+import com.gerenciadororcamentos.dto.DadosAtualizacaoCliente;
 import com.gerenciadororcamentos.dto.DadosCadastroCliente;
 import com.gerenciadororcamentos.dto.DadosDetalhamentoCliente;
 import com.gerenciadororcamentos.dto.DadosListagemDeClientes;
@@ -12,7 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 
 
@@ -30,7 +30,7 @@ public class ClienteController {
     }
 
     @Transactional
-    @PutMapping
+    @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody DadosCadastroCliente dados) {
         var cliente = new Cliente(dados);
         service.cadastrar(cliente);
@@ -57,5 +57,29 @@ public class ClienteController {
 
         return ResponseEntity.ok(page);
     }
-}
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
+
+        if (id == null || id <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        clienteRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    //Regra de negocio: O cliente só pode ter o email e telefone atualizados, o nome não pode ser atualizado.
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarPorId(@RequestBody DadosAtualizacaoCliente dados, @RequestParam Long id) {
+
+        if (!clienteRepository.existsById(id)) {
+            ResponseEntity.badRequest().build();
+        }
+        var clienteAtualizado = clienteRepository.findById(id).get();
+        clienteAtualizado.setEmail(dados.email());
+        clienteAtualizado.setTelefone(dados.telefone());
+        clienteRepository.save(clienteAtualizado);
+        return ResponseEntity.ok().build();
+
+    }
+}
